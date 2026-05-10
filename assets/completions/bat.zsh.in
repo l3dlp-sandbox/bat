@@ -90,12 +90,12 @@ _{{PROJECT_EXECUTABLE}}_main() {
         languages)
             local IFS=$'\n'
             local -a languages
-            # Only offer language names as completion values. The second column
-            # of `--list-languages` mixes plain extensions with globs (`*.rs`),
-            # absolute paths (`/etc/profile`), and full filenames
-            # (`Containerfile`); none of those parse as `-l` arguments. See
+            # `--list-languages` emits one `name:matchers` line per language,
+            # which `_describe` parses as `value:description`. Only the
+            # language name is offered as the completion value; the matchers
+            # show up as the menu description. See
             # https://github.com/sharkdp/bat/issues/3735.
-            languages=( ${(f)"$({{PROJECT_EXECUTABLE}} --color=never --decorations=never --list-languages | awk -F: '{ printf("%s:%s\n", $1, $2) }')"} )
+            languages=( ${(f)"$({{PROJECT_EXECUTABLE}} --color=never --decorations=never --list-languages)"} )
 
             _describe 'language' languages && ret=0
         ;;
