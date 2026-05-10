@@ -90,7 +90,12 @@ _{{PROJECT_EXECUTABLE}}_main() {
         languages)
             local IFS=$'\n'
             local -a languages
-            languages=( ${(f)"$({{PROJECT_EXECUTABLE}} --color=never --decorations=never --list-languages | awk -F':|,' '{ for (i = 1; i <= NF; ++i) printf("%s:%s\n", $i, $1) }')"} )
+            # Only offer language names as completion values. The second column
+            # of `--list-languages` mixes plain extensions with globs (`*.rs`),
+            # absolute paths (`/etc/profile`), and full filenames
+            # (`Containerfile`); none of those parse as `-l` arguments. See
+            # https://github.com/sharkdp/bat/issues/3735.
+            languages=( ${(f)"$({{PROJECT_EXECUTABLE}} --color=never --decorations=never --list-languages | awk -F: '{ printf("%s:%s\n", $1, $2) }')"} )
 
             _describe 'language' languages && ret=0
         ;;
